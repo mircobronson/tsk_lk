@@ -11,39 +11,25 @@
             <v-card-text>
               <v-form>
                 <v-text-field
-                  v-model.trim="name"
-                  :error-messages="nameErrors"
+                  v-model.trim="email"
+                  :error-messages="emailErrors"
                   :counter="100"
-                  label="Имя"
+                  label="email"
                   required
-                  @input="$v.name.$touch()"
-                  @blur="$v.name.$touch()"
+                  @input="$v.email.$touch()"
+                  @blur="$v.email.$touch()"
                 ></v-text-field>
                 <v-text-field
                   v-model.trim="password"
                   :error-messages="passwordErrors"
+                  :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="showPassword ? 'text' : 'password'"
                   label="Пароль"
                   required
                   @input="$v.password.$touch()"
                   @blur="$v.password.$touch()"
+                  @click:append="showPassword = !showPassword"
                 ></v-text-field>
-                <!-- <v-select
-                  v-model="select"
-                  :items="items"
-                  :error-messages="selectErrors"
-                  label="Item"
-                  required
-                  @change="$v.select.$touch()"
-                  @blur="$v.select.$touch()"
-                ></v-select> -->
-                <!-- <v-checkbox
-                  v-model="checkbox"
-                  :error-messages="checkboxErrors"
-                  label="Согласен с условиями использования сервиса "
-                  required
-                  @change="$v.checkbox.$touch()"
-                  @blur="$v.checkbox.$touch()"
-                ></v-checkbox> -->
               </v-form>
             </v-card-text>
             <v-card-actions>
@@ -64,7 +50,8 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
+import { email, required, maxLength } from 'vuelidate/lib/validators'
+import { mapGetters } from 'vuex'
 
 export default {
   layout: 'empty',
@@ -73,70 +60,48 @@ export default {
   },
   mixins: [validationMixin],
   validations: {
-    name: { required, maxLength: maxLength(100) },
-    password: { required, minLength: minLength(5) },
     email: { required, email },
-    select: { required },
-    checkbox: {
-      checked (val) {
-        return val
-      }
-    }
+    password: { required, maxLength: maxLength(100) }
   },
   data: () => ({
-    name: '',
+    email: '',
     password: '',
-    select: null,
-    items: ['Item 1', 'Item 2'],
-    checkbox: false
+    showPassword: false
   }),
   computed: {
-    checkboxErrors () {
-      const errors = []
-      /* eslint-disable */
-      if (!this.$v.checkbox.$dirty) return errors;
-      !this.$v.checkbox.checked && errors.push("You must agree to continue!");
-      /* eslint-disable */
-      return errors;
-    },
-    selectErrors() {
+    ...mapGetters([
+      'USERINFO'
+    ]),
+    /* eslint-disable */
+    emailErrors() {
       const errors = [];
-      if (!this.$v.select.$dirty) return errors;
-      !this.$v.select.required && errors.push("Item is required");
-      return errors;
-    },
-    nameErrors() {
-      const errors = [];
-      if (!this.$v.name.$dirty) return errors;
-      !this.$v.name.maxLength &&
-        errors.push("Name must be at most 10 characters long");
-      !this.$v.name.required && errors.push("Имя не заполнено.");
+      if (!this.$v.email.$dirty) return errors;
+      !this.$v.email.email && errors.push("e-mail должен быть правильно заполнен");
+      !this.$v.email.required && errors.push("поле обязательно");
       return errors;
     },
      passwordErrors() {
       const errors = [];
       if (!this.$v.password.$dirty) return errors;
-      !this.$v.password.maxLength &&
-        errors.push("Name must be at most 10 characters long");
-      !this.$v.password.required && errors.push("Не заполнен пароль.");
+        !this.$v.password.required && errors.push("Не заполнен пароль.");
       return errors;
-    },
-    emailErrors() {
-      const errors = [];
-      if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.email && errors.push("Must be valid e-mail");
-      !this.$v.email.required && errors.push("E-mail is required");
-      return errors;
-    },
+    }
   },
   methods: {
-    submit() {
+    async Login() {
       this.$v.$touch();
-      this.$router.push("/lkapp");
-    },
-    Login() {
-      this.$v.$touch();
-      this.$router.push("/lkapp");
+      if (this.$v.$invalid) {
+        //console.log('submit!')
+      } else {
+        const formData = {
+          email: this.email,
+          password: this.password
+        };
+        try {
+          await this.$store.dispatch('LOGIN',{formData})
+          this.$router.push("/lkapp")
+        } catch (error) {}
+      }
     },
     Signup() {
       this.$v.$touch();
@@ -144,10 +109,8 @@ export default {
     },
     clear() {
       this.$v.$reset();
-      this.name = "";
       this.email = "";
-      this.select = null;
-      this.checkbox = false;
+      this.password = "";
     },
   },
 };

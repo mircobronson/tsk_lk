@@ -4,7 +4,7 @@
         <option v-for="month in months" v-bind:value="month.month" v-bind:key="month.month" >{{month.month}} </option>
     </select> -->
 <v-card>
-  <v-btn color="primary" icon @click="PaySelected"> <v-icon right >mdi-money</v-icon> Оплатить выбранные строки</v-btn>
+  <v-btn color="primary" @click="PaySelected"><v-icon>mdi-credit-card-outline</v-icon>Оплатить выбранные строки</v-btn>
   <v-card-actions>
 
      <v-select
@@ -19,7 +19,7 @@
   <v-data-table
     v-model="selected"
     :headers="headers"
-    :items="calculations.data"
+    :items="CALCULATIONS"
     :single-select="singleSelect"
     item-key="id"
     show-select
@@ -38,8 +38,10 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 import axios from 'axios'
 export default {
+  /* eslint-disable */
   data () {
     return {
       singleSelect: false,
@@ -57,19 +59,28 @@ export default {
         { text: 'Количество', value: 'quantity' },
         { text: 'Сумма', value: 'total' }
       ],
-      months: [],
-      calculations: []
+      months: []
     }
   },
+  computed: {
+    ...mapGetters([
+      'CALCULATIONS'
+    ])
+  },
   mounted () {
+    this.GET_CALCULATION()
     axios
       .get('http://192.168.1.50:3001/months')
       .then(response => (this.months = response))
-    axios
-      .get('http://192.168.1.50:3001/calculations')
-      .then(response => (this.calculations = response))
+    // axios
+    // 690050130040
+    //  .get('http://192.168.1.50:3001/calculations?pa_uid=eq.93f87953-2aab-11e9-a236-0cc47adb9e09')
+    //  .then(response => (this.calculations = response))
   },
   methods: {
+    ...mapActions([
+      'GET_CALCULATION'
+    ]),
     PaySelected () {
       // this.$v.$touch();
       // this.$router.push("/lkapp");

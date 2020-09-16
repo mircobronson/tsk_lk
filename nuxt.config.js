@@ -34,7 +34,7 @@ export default {
       { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/png', href: '/delete_ic.png' }
+      { rel: 'icon', type: 'image/png', href: '/trash-can.png' }
     ]
   },
   /*
@@ -67,10 +67,27 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    '@nuxtjs/pwa',
+     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt/content
-    '@nuxt/content'
+    '@nuxt/content',
+    '@nuxtjs/firebase',
   ],
+  firebase: {
+    config: {
+      apiKey: "AIzaSyDhJZ06LlCLup5T6j5i7yU2fHf9BGoD0Ww",
+      authDomain: "tsklk3.firebaseapp.com",
+      databaseURL: "https://tsklk3.firebaseio.com",
+      projectId: "tsklk3",
+      storageBucket: "tsklk3.appspot.com",
+      messagingSenderId: "139966132967",
+      appId: "1:139966132967:web:58ff7c06d14beaade9e842",
+      measurementId: "G-SE0BWG8J42"
+    },
+    services: {
+      auth: true // Just as example. Can be any other service.
+    }
+
+  },
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options

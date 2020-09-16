@@ -2,7 +2,7 @@
 <v-card>
 
  <v-col
-          v-for="(device, id) in devices.data"
+          v-for="(device, id) in DEVICES"
           :key="id"
           cols="12"
                   >
@@ -42,7 +42,7 @@
 <script>
 import { validationMixin } from 'vuelidate'
 import { required, maxLength } from 'vuelidate/lib/validators'
-import axios from 'axios'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   head: {
@@ -62,12 +62,14 @@ export default {
     return {
       singleSelect: true,
       selected: [],
-      selectedDevice: '',
-      devices: [],
-      device_readings: []
+      selectedDevice: ''
     }
   },
   computed: {
+    ...mapGetters([
+      'DEVICES',
+      'DEVICESREADINGS'
+    ]),
     /* eslint-disable */
     readErrors () {
       const errors = [];
@@ -79,14 +81,20 @@ export default {
     },
    },
   mounted () {
-    axios
-      .get('http://192.168.1.50:3001/devices')
-      .then(response => (this.devices = response))
-    axios
-      .get('http://192.168.1.50:3001/device_readings')
-      .then(response => (this.device_readings = response))
+    this.GET_DEVICES()
+    this.GET_DEVICESREADINGS()
+    //axios
+    //  .get('http://192.168.1.50:3001/mdevices')
+    //  .then(response => (this.devices = response))
+    //axios
+    //  .get('http://192.168.1.50:3001/mdevice_readings')
+    //  .then(response => (this.device_readings = response))
   },
   methods: {
+    ...mapActions([
+      'GET_DEVICES',
+      'GET_DEVICESREADINGS',
+    ]),
     SayReadings () {
       // this.$v.$touch();
       // this.$router.push("/lkapp");

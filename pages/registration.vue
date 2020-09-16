@@ -61,7 +61,7 @@
               <!-- <v-btn class="mr-4" @click="submit">submit</v-btn> -->
               <!-- <v-btn @click="clear">clear</v-btn> -->
               <!--<v-btn color="primary" @click="Login">Войти</v-btn>-->
-              <v-btn color="primary" @click="Signup">Зарегистрироваться</v-btn>
+              <v-btn color="primary" @click="SignUp">Зарегистрироваться</v-btn>
 
             </v-card-actions>
           </v-card>
@@ -73,7 +73,7 @@
 
 <script>
 import { validationMixin } from 'vuelidate'
-import { required, maxLength, email } from 'vuelidate/lib/validators'
+import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
 
 export default {
   layout: 'empty',
@@ -82,7 +82,8 @@ export default {
   },
   mixins: [validationMixin],
   validations: {
-    name: { required, maxLength: maxLength(10) },
+    name: { required, maxLength: maxLength(100) },
+    password: { required, minLength: minLength(5) },
     email: { required, email },
     select: { required },
     checkbox: {
@@ -93,6 +94,7 @@ export default {
   },
   data: () => ({
     name: '',
+    password: '',
     email: '',
     select: null,
     items: ['Физическое лицо', 'Юридическое лицо', 'Индивидуальный предприниматель'],
@@ -103,35 +105,56 @@ export default {
       const errors = []
       /* eslint-disable */
       if (!this.$v.checkbox.$dirty) return errors;
-      !this.$v.checkbox.checked && errors.push("You must agree to continue!");
+      !this.$v.checkbox.checked && errors.push("Вы должны согласится с условиями");
       /* eslint-disable */
       return errors;
     },
     selectErrors() {
       const errors = [];
       if (!this.$v.select.$dirty) return errors;
-      !this.$v.select.required && errors.push("Item is required");
+      !this.$v.select.required && errors.push("Поле обязательно к заполнению");
       return errors;
     },
     nameErrors() {
       const errors = [];
       if (!this.$v.name.$dirty) return errors;
       !this.$v.name.maxLength &&
-        errors.push("Name must be at most 10 characters long");
-      !this.$v.name.required && errors.push("Name is required.");
+        errors.push("Имя должно быть короче 100 символов");
+      !this.$v.name.required && errors.push("поле обязательно");
+      return errors;
+    },
+    passwordErrors() {
+      const errors = [];
+      if (!this.$v.password.$dirty) return errors;
+      !this.$v.password.minLength &&
+        errors.push("Пароль должен быть длиннее 5 символов");
+      !this.$v.password.required && errors.push("поле обязательно");
       return errors;
     },
     emailErrors() {
       const errors = [];
       if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.email && errors.push("Must be valid e-mail");
-      !this.$v.email.required && errors.push("E-mail is required");
+      !this.$v.email.email && errors.push("e-mail должен быть правильно заполнен");
+      !this.$v.email.required && errors.push("поле обязательно");
       return errors;
     },
   },
   methods: {
-    submit() {
+    async SignUp() {
       this.$v.$touch();
+      if (this.$v.$invalid) {
+         //console.log('reg!')
+      } else {
+        const formData = {
+          name: this.name,
+          email: this.email,
+          password: this.password
+        };
+        try {
+          await this.$store.dispatch('SIGNUP',{formData})
+          this.$router.push("/")
+        } catch (error) {}
+      }
     },
     clear() {
       this.$v.$reset();

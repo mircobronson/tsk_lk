@@ -5,13 +5,12 @@ class="mx-auto">
 <v-card-text>
       <div>Новые оповещения</div>
       <p class="display-1 text--primary">
-        пока ничего нет
+        Ваша задолженность составляет 304 руб. 15 коп.
       </p>
-      <p>но</p>
+      <p>Оплатить можно в разделе "Начисления"</p>
       <div class="text--primary">
-        будем выводить<br>
-        "всякое"
       </div>
+      <v-btn><v-icon>mdi-credit-card-outline</v-icon>Оплатить</v-btn>
     </v-card-text>
 
 </v-card>
